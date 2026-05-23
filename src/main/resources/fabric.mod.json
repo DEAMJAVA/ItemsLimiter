@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "items-limiter",
+	"version": "${version}",
+	"name": "Items Limiter",
+	"description": "Add Item Limitations to your server!",
+	"authors": [
+		"DEAMJAVA"
+	],
+	"contact": {
+		"homepage": "https://github.com/DEAMJAVA/ItemsLimiter",
+		"sources": "https://github.com/DEAMJAVA/ItemsLimiter"
+	},
+	"license": "GPLv3",
+	"icon": "assets/items-limiter/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			{
+				"value": "net.deamjava.items_limiter.ItemsLimiter",
+				"adapter": "kotlin"
+			}
+		]
+	},
+	"mixins": [
+		"items-limiter.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.2",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*",
+		"fabric-language-kotlin": "*"
+	}
+}

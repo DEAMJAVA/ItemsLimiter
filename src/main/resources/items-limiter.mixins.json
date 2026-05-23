@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "net.deamjava.items_limiter.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AnvilMenuMixin",
+    "CraftingMenuMixin",
+    "EnchantmentMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+	}
+}
