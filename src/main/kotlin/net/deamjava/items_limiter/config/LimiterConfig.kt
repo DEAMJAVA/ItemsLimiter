@@ -46,6 +46,25 @@ object LimiterConfig {
         }
     }
 
+    fun save() {
+        try {
+            val root = JsonObject()
+
+            val items = JsonObject()
+            itemLimits.forEach { (k, v) -> items.addProperty(k, v) }
+            root.add("item_limits", items)
+
+            val enchants = JsonObject()
+            enchantmentLimits.forEach { (k, v) -> enchants.addProperty(k, v) }
+            root.add("enchantment_limits", enchants)
+
+            configFile.writeText(gson.toJson(root))
+            logger.info("Saved config: ${itemLimits.size} item limits, ${enchantmentLimits.size} enchantment limits")
+        } catch (e: Exception) {
+            logger.error("Failed to save config", e)
+        }
+    }
+
     private fun writeDefaults() {
         val root = JsonObject()
 

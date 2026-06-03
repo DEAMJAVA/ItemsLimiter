@@ -1,7 +1,7 @@
 package net.deamjava.items_limiter.mixin;
 
 import net.deamjava.items_limiter.manager.ItemLimitManager;
-import net.deamjava.items_limiter.ModComponents;
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -37,20 +37,16 @@ public class CraftingMenuMixin {
         ItemStack result = resultSlots.getItem(0);
         if (result.isEmpty()) return;
 
-        boolean blocked = ItemLimitManager.INSTANCE.shouldBlockCraft(level.getServer(), result);
+        String id = ItemLimitManager.INSTANCE.itemId(result);
+        boolean blocked = ItemLimitManager.INSTANCE.shouldBlockCraft(id);
+
         if (blocked) {
             resultSlots.setItem(0, ItemStack.EMPTY);
             menu.setRemoteSlot(0, ItemStack.EMPTY);
             if (player instanceof ServerPlayer sp) {
-                sp.connection.send(
-                        new net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket(
-                                menu.containerId, menu.incrementStateId(), 0, ItemStack.EMPTY
-                        )
-                );
-            }
-        } else {
-            if (!result.has(ModComponents.INSTANCE.getLIMITER_TAG())) {
-                ItemLimitManager.INSTANCE.tagStack(result);
+                sp.connection.send(new ClientboundContainerSetSlotPacket(
+                        menu.containerId, menu.incrementStateId(), 0, ItemStack.EMPTY
+                ));
             }
         }
     }
