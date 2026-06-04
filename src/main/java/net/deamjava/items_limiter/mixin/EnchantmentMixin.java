@@ -40,7 +40,7 @@ public class EnchantmentMixin {
                     }
                     return instance;
                 })
-                .toList();
+                .collect(java.util.stream.Collectors.toCollection(java.util.ArrayList::new)); // ← mutable!
 
         if (filtered.size() != original.size() || !filtered.equals(original)) {
             cir.setReturnValue(filtered);
