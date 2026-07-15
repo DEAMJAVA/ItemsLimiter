@@ -17,7 +17,6 @@ object ItemRegistry {
         .resolve("items_limiter_registry.json")
         .toFile()
 
-    // itemId -> list of assigned UUIDs
     private val registry: MutableMap<String, MutableList<UUID>> = mutableMapOf()
 
     fun load() {
@@ -54,17 +53,13 @@ object ItemRegistry {
         }
     }
 
-    /** How many tagged copies are registered for this item. */
     fun countFor(itemId: String): Int = registry[itemId]?.size ?: 0
 
-    /** Returns true if this UUID is already registered. */
+
     fun isRegistered(itemId: String, uuid: UUID): Boolean =
         registry[itemId]?.contains(uuid) == true
 
-    /**
-     * Tries to register a new UUID for the given item against the limit.
-     * Returns the assigned UUID if successful, null if the limit is already reached.
-     */
+
     fun tryRegister(itemId: String, limit: Int): UUID? {
         val list = registry.getOrPut(itemId) { mutableListOf() }
         if (list.size >= limit) return null
@@ -74,7 +69,6 @@ object ItemRegistry {
         return uuid
     }
 
-    /** Removes a UUID from the registry (e.g. item was destroyed). */
     fun unregister(itemId: String, uuid: UUID) {
         registry[itemId]?.remove(uuid)
         save()
