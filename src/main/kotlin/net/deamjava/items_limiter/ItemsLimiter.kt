@@ -4,6 +4,7 @@ import net.deamjava.items_limiter.command.LimiterCommand
 import net.deamjava.items_limiter.config.LimiterConfig
 import net.deamjava.items_limiter.listener.PlayerJoinListener
 import net.deamjava.items_limiter.listener.ServerTickListener
+import net.deamjava.items_limiter.registry.ExclusionRegistry
 import net.deamjava.items_limiter.registry.ItemRegistry
 import net.fabricmc.api.ModInitializer
 import org.slf4j.LoggerFactory
@@ -17,6 +18,7 @@ object ItemsLimiter : ModInitializer {
 		ModComponents.init()
 		LimiterConfig.load()
 		ItemRegistry.load()
+		ExclusionRegistry.load()
 		ServerTickListener.register()
 		PlayerJoinListener.register()
 		LimiterCommand.register()

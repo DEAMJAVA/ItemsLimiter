@@ -1,9 +1,11 @@
 package net.deamjava.items_limiter.command
 
 import com.mojang.brigadier.arguments.IntegerArgumentType
+import net.deamjava.items_limiter.ModComponents
 import net.deamjava.items_limiter.config.LimiterConfig
 import net.deamjava.items_limiter.manager.EnchantmentLimitManager
 import net.deamjava.items_limiter.manager.ItemLimitManager
+import net.deamjava.items_limiter.registry.ExclusionRegistry
 import net.deamjava.items_limiter.registry.ItemRegistry
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.commands.Commands
@@ -11,6 +13,7 @@ import net.minecraft.commands.arguments.ResourceArgument
 import net.minecraft.commands.synchronization.SuggestionProviders
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
+import java.util.UUID
 
 object LimiterCommand {
 
@@ -191,6 +194,68 @@ object LimiterCommand {
                                 )
                                 1
                             }
+                    )
+                    .then(
+                        Commands.literal("exclude")
+                            // /itemslimiter exclude  -> excludes the item in your main hand
+                            .executes { ctx ->
+                                val player = ctx.source.playerOrException
+                                val stack = player.mainHandItem
+                                if (stack.isEmpty) {
+                                    ctx.source.sendFailure(Component.literal("You must hold an item."))
+                                    return@executes 0
+                                }
+
+                                val itemId = ItemLimitManager.itemId(stack)
+                                var uuid = ModComponents.getTag(stack)
+
+                                if (uuid == null) {
+                                    val limit = LimiterConfig.getItemLimit(itemId)
+                                    uuid = (if (limit != null && limit > 0) ItemRegistry.tryRegister(itemId, limit) else null)
+                                        ?: UUID.randomUUID()
+                                    ModComponents.setTag(stack, uuid)
+                                }
+
+                                if (ExclusionRegistry.add(uuid)) {
+                                    ctx.source.sendSuccess(
+                                        { Component.literal("Excluded held $itemId (id $uuid). It will be ignored by all limits.") },
+                                        true
+                                    )
+                                } else {
+                                    ctx.source.sendSuccess(
+                                        { Component.literal("This item is already excluded.") },
+                                        false
+                                    )
+                                }
+                                1
+                            }
+                            .then(
+                                Commands.literal("remove")
+                                    .executes { ctx ->
+                                        val player = ctx.source.playerOrException
+                                        val uuid = ModComponents.getTag(player.mainHandItem)
+                                        if (uuid != null && ExclusionRegistry.remove(uuid)) {
+                                            ctx.source.sendSuccess(
+                                                { Component.literal("Held item is no longer excluded; limits apply again.") },
+                                                true
+                                            )
+                                            1
+                                        } else {
+                                            ctx.source.sendFailure(Component.literal("Held item is not excluded."))
+                                            0
+                                        }
+                                    }
+                            )
+                            .then(
+                                Commands.literal("list")
+                                    .executes { ctx ->
+                                        ctx.source.sendSuccess(
+                                            { Component.literal("${ExclusionRegistry.count()} excluded item(s).") },
+                                            false
+                                        )
+                                        1
+                                    }
+                            )
                     )
             )
         }

@@ -2,6 +2,7 @@ package net.deamjava.items_limiter.manager
 
 import net.deamjava.items_limiter.ModComponents
 import net.deamjava.items_limiter.config.LimiterConfig
+import net.deamjava.items_limiter.registry.ExclusionRegistry
 import net.deamjava.items_limiter.registry.ItemRegistry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.server.MinecraftServer
@@ -43,6 +44,7 @@ object ItemLimitManager {
         for (i in 0 until inventory.containerSize) {
             val stack = inventory.getItem(i)
             if (stack.isEmpty) continue
+            if (ExclusionRegistry.isExcluded(stack)) continue
             val id = itemId(stack)
             val limit = LimiterConfig.getItemLimit(id) ?: continue
 
@@ -90,6 +92,7 @@ object ItemLimitManager {
             entities.forEach { entity ->
                 val stack = entity.item
                 if (stack.isEmpty) return@forEach
+                if (ExclusionRegistry.isExcluded(stack)) return@forEach
                 val id = itemId(stack)
                 val limit = LimiterConfig.getItemLimit(id) ?: return@forEach
 

@@ -1,6 +1,7 @@
 package net.deamjava.items_limiter.manager
 
 import net.deamjava.items_limiter.config.LimiterConfig
+import net.deamjava.items_limiter.registry.ExclusionRegistry
 import net.minecraft.core.Holder
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.EquipmentSlot
@@ -25,6 +26,7 @@ object EnchantmentLimitManager {
 
     fun clampEnchantments(stack: ItemStack): Boolean {
         if (stack.isEmpty) return false
+        if (ExclusionRegistry.isExcluded(stack)) return false
         val enchants = stack.enchantments
         var changed = false
 
